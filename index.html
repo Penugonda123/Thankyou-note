@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A premium single-page appreciation note with a heartfelt thank-you message."
+    />
+    <title>A Small Response. A Big Difference.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+    <header class="site-header" aria-label="Page navigation">
+      <a class="brand" href="#top" aria-label="Back to top">
+        <span class="brand-mark" aria-hidden="true"></span>
+        Appreciation
+      </a>
+      <nav class="nav-links" aria-label="Sections">
+        <a href="#message">Message</a>
+        <a href="#together">Together</a>
+        <a href="#quote">Quote</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" id="top">
+        <img
+          class="hero-asset"
+          src="./assets/hero-glass.png"
+          alt=""
+          aria-hidden="true"
+        />
+        <div class="hero-vignette" aria-hidden="true"></div>
+
+        <div class="hero-content">
+          <p class="eyebrow reveal-load">A note of gratitude</p>
+          <div class="thank-you-glow reveal-load" aria-label="Thank You">
+            Thank You
+          </div>
+          <h1 class="hero-title reveal-load">
+            <span
+              id="typedTitle"
+              data-text="A Small Response. A Big Difference."
+            ></span>
+            <span class="typing-cursor" aria-hidden="true"></span>
+          </h1>
+          <p class="hero-subtitle reveal-load">
+            Sometimes appreciation isn't about grand gestures&mdash;it's about
+            recognizing the value of being present, responsive, and supportive.
+          </p>
+          <div class="hero-actions reveal-load">
+            <a class="primary-cta magnetic" href="#message">
+              <span class="cta-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" role="img">
+                  <path d="M12 7v5l3.2 1.9" />
+                  <path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+              </span>
+              See You at 10:30 PM
+            </a>
+            <a class="secondary-link" href="#quote">Read the closing thought</a>
+          </div>
+        </div>
+
+        <aside class="floating-thanks reveal-load" aria-label="Small thank-you symbol">
+          <div class="thank-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 3.7 13.8 9l5.5 1.2-4 3.7.6 5.6L12 16.7 8.1 19.5l.6-5.6-4-3.7L10.2 9 12 3.7Z" />
+            </svg>
+          </div>
+          <span>Present when it mattered</span>
+        </aside>
+
+        <a class="scroll-cue" href="#message" aria-label="Scroll to message">
+          <span></span>
+        </a>
+      </section>
+
+      <section class="section message-section" id="message">
+        <div class="section-heading reveal">
+          <p class="eyebrow">The message</p>
+          <h2>Simple actions can carry a quiet kind of strength.</h2>
+        </div>
+
+        <article class="message-card reveal" aria-label="Main thank-you message">
+          <p>
+            Thank you so much for your kind words. Honestly, I don't think I did
+            anything extraordinary&mdash;I simply responded because I believe
+            that whenever something is important for our home, our team, or our
+            friends, we should all be available and contribute. Communication is
+            what keeps a group strong, and being responsive is a simple way of
+            showing respect for everyone's time and effort.
+          </p>
+          <p>
+            Your appreciation means a lot to me. It motivates me to continue
+            being someone who can always be counted on whenever needed. Every
+            meeting, every discussion, and every decision becomes easier when
+            everyone participates with the same spirit of cooperation.
+          </p>
+          <p>
+            Let's continue supporting one another, solving problems together,
+            respecting each other's opinions, and making our flat not just a
+            place to stay, but a place where teamwork, friendship, and trust grow
+            stronger every day.
+          </p>
+          <p>
+            Thank you once again for your thoughtful message. Looking forward to
+            meeting everyone at 10:30 PM and having a productive discussion
+            together. Wishing everyone a wonderful evening!
+          </p>
+        </article>
+      </section>
+
+      <section class="section together-section" id="together">
+        <div class="section-heading reveal">
+          <p class="eyebrow">What we keep building</p>
+          <h2>A home feels better when everyone shows up with care.</h2>
+        </div>
+
+        <div class="values-grid">
+          <article class="glass-card reveal">
+            <div class="card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M4 6.5h16M4 12h10M4 17.5h16" />
+              </svg>
+            </div>
+            <h3>Clear Communication</h3>
+            <p>
+              Shared attention keeps decisions lighter, cleaner, and easier for
+              everyone involved.
+            </p>
+          </article>
+          <article class="glass-card reveal">
+            <div class="card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M7 11.5 11 15l6-7" />
+                <path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+              </svg>
+            </div>
+            <h3>Reliable Support</h3>
+            <p>
+              Being responsive is a small gesture, but it tells people their
+              time matters.
+            </p>
+          </article>
+          <article class="glass-card reveal">
+            <div class="card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 3v18" />
+                <path d="M5 8h14" />
+                <path d="M7 16h10" />
+              </svg>
+            </div>
+            <h3>Steady Teamwork</h3>
+            <p>
+              Every discussion becomes stronger when respect, patience, and
+              trust stay in the room.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section closing-section">
+        <div class="closing-panel reveal">
+          <p class="eyebrow">Tonight</p>
+          <h2>See you at 10:30 PM.</h2>
+          <p>
+            A productive discussion begins with the same spirit this note
+            celebrates: listening well, speaking honestly, and solving together.
+          </p>
+          <a class="primary-cta compact magnetic" href="#top">
+            <span class="cta-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="img">
+                <path d="m18 15-6-6-6 6" />
+              </svg>
+            </span>
+            Back to the note
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer" id="quote">
+      <div class="wave-layer" aria-hidden="true">
+        <span class="wave wave-one"></span>
+        <span class="wave wave-two"></span>
+        <span class="wave wave-three"></span>
+      </div>
+      <p class="footer-quote reveal" data-animate-quote>
+        Respect is earned through actions, trust is built through consistency,
+        and great friendships are strengthened by simple moments of support.
+      </p>
+    </footer>
+
+    <script src="./script.js"></script>
+  </body>
+</html>

@@ -111,34 +111,74 @@ function updateCountdown() {
 updateCountdown();
 window.setInterval(updateCountdown, 1000);
 
-const statObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
+const rentTable = document.querySelector("#rentTable");
+const totalPendingOutput = document.querySelector("#totalPendingOutput");
+const memberCount = document.querySelector("#memberCount");
+const defaultPendingInput = document.querySelector("#defaultPendingInput");
+const applyPending = document.querySelector("#applyPending");
+const currencyFormatter = new Intl.NumberFormat("en-IN");
 
-      const value = Number(entry.target.dataset.count || 0);
-      const duration = reducedMotion ? 1 : 1200;
-      const start = performance.now();
+function getAmount(input) {
+  return Math.max(Number(input?.value || 0), 0);
+}
 
-      function animate(currentTime) {
-        const progress = Math.min((currentTime - start) / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        const currentValue = Math.round(value * eased);
-        entry.target.textContent = currentValue.toLocaleString("en-IN");
+function setStatus(row) {
+  const rent = getAmount(row.querySelector(".rent-input"));
+  const paid = getAmount(row.querySelector(".paid-input"));
+  const pending = getAmount(row.querySelector(".pending-input"));
+  const status = row.querySelector(".status");
 
-        if (progress < 1) {
-          requestAnimationFrame(animate);
-        }
-      }
+  if (!status) return;
 
-      requestAnimationFrame(animate);
-      statObserver.unobserve(entry.target);
-    });
-  },
-  { threshold: 0.4 },
-);
+  const isPaid = pending <= 0 || (rent > 0 && paid >= rent);
+  status.textContent = isPaid ? "Paid" : "Pending";
+  status.classList.toggle("paid", isPaid);
+  status.classList.toggle("pending", !isPaid);
+}
 
-document.querySelectorAll("[data-count]").forEach((item) => statObserver.observe(item));
+function updateRentTotals() {
+  const rows = Array.from(rentTable?.querySelectorAll("tbody tr") || []);
+  const pendingTotal = rows.reduce((total, row) => {
+    setStatus(row);
+    return total + getAmount(row.querySelector(".pending-input"));
+  }, 0);
+
+  if (memberCount) memberCount.textContent = String(rows.length);
+  if (totalPendingOutput) {
+    totalPendingOutput.textContent = `Rs. ${currencyFormatter.format(pendingTotal)}`;
+  }
+}
+
+rentTable?.addEventListener("input", (event) => {
+  const target = event.target;
+  const row = target.closest("tr");
+  if (!row) return;
+
+  if (target.classList.contains("rent-input") || target.classList.contains("paid-input")) {
+    const rent = getAmount(row.querySelector(".rent-input"));
+    const paid = getAmount(row.querySelector(".paid-input"));
+    const pendingInput = row.querySelector(".pending-input");
+    if (pendingInput) pendingInput.value = String(Math.max(rent - paid, 0));
+  }
+
+  updateRentTotals();
+});
+
+applyPending?.addEventListener("click", () => {
+  const pendingValue = getAmount(defaultPendingInput);
+  rentTable?.querySelectorAll("tbody tr").forEach((row) => {
+    const rentInput = row.querySelector(".rent-input");
+    const paidInput = row.querySelector(".paid-input");
+    const pendingInput = row.querySelector(".pending-input");
+
+    if (rentInput) rentInput.value = String(pendingValue);
+    if (paidInput) paidInput.value = "0";
+    if (pendingInput) pendingInput.value = String(pendingValue);
+  });
+  updateRentTotals();
+});
+
+updateRentTotals();
 
 const nav = document.querySelector("#primaryNav");
 const menuToggle = document.querySelector(".menu-toggle");

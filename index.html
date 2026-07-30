@@ -222,7 +222,7 @@
           </article>
           <article class="reason-card reveal">
             <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
-            <span>Share monthly expenses</span>
+            <span>Review rent status</span>
           </article>
           <article class="reason-card reveal">
             <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
@@ -293,17 +293,39 @@
 
       <section class="section summary-section" id="summary">
         <div class="section-heading reveal">
-          <p class="eyebrow">Rent Summary</p>
-          <h2>Sample rent status for the meeting.</h2>
+          <p class="eyebrow">Rent Status</p>
+          <h2>Editable rent status for Flat No.102.</h2>
+        </div>
+
+        <div class="rent-overview reveal" aria-label="Rent overview editor">
+          <label class="rent-control" for="totalRentInput">
+            <span>Total Rent Amount</span>
+            <input id="totalRentInput" type="number" min="0" value="86880" />
+          </label>
+          <label class="rent-control" for="defaultPendingInput">
+            <span>Default Pending</span>
+            <input id="defaultPendingInput" type="number" min="0" value="9563" />
+          </label>
+          <button class="secondary-cta compact" type="button" id="applyPending">
+            <i class="fa-solid fa-rotate" aria-hidden="true"></i>
+            Apply Pending
+          </button>
+          <div class="summary-metric">
+            <span>Members</span>
+            <strong id="memberCount">7</strong>
+          </div>
+          <div class="summary-metric warning">
+            <span>Total Pending</span>
+            <strong id="totalPendingOutput">Rs. 66,941</strong>
+          </div>
         </div>
 
         <div class="table-shell reveal">
-          <table>
+          <table class="rent-table" id="rentTable">
             <thead>
               <tr>
                 <th>Member Name</th>
-                <th>Room</th>
-                <th>Monthly Rent</th>
+                <th>Rent Amount</th>
                 <th>Paid</th>
                 <th>Pending</th>
                 <th>Status</th>
@@ -311,89 +333,56 @@
             </thead>
             <tbody>
               <tr>
-                <td>Arjun</td>
-                <td>A</td>
-                <td>Rs. 8,000</td>
-                <td>Rs. 8,000</td>
-                <td>Rs. 0</td>
-                <td><span class="status paid">Paid</span></td>
-              </tr>
-              <tr>
-                <td>Rahul</td>
-                <td>B</td>
-                <td>Rs. 8,000</td>
-                <td>Rs. 5,000</td>
-                <td>Rs. 3,000</td>
+                <td><input class="table-input name-input" type="text" value="Murali" aria-label="Member name Murali" /></td>
+                <td><input class="table-input rent-input" type="number" min="0" value="9563" aria-label="Rent amount for Murali" /></td>
+                <td><input class="table-input paid-input" type="number" min="0" value="0" aria-label="Paid amount for Murali" /></td>
+                <td><input class="table-input pending-input" type="number" min="0" value="9563" aria-label="Pending amount for Murali" /></td>
                 <td><span class="status pending">Pending</span></td>
               </tr>
               <tr>
-                <td>Kiran</td>
-                <td>C</td>
-                <td>Rs. 7,500</td>
-                <td>Rs. 7,500</td>
-                <td>Rs. 0</td>
-                <td><span class="status paid">Paid</span></td>
+                <td><input class="table-input name-input" type="text" value="Chandu" aria-label="Member name Chandu" /></td>
+                <td><input class="table-input rent-input" type="number" min="0" value="9563" aria-label="Rent amount for Chandu" /></td>
+                <td><input class="table-input paid-input" type="number" min="0" value="0" aria-label="Paid amount for Chandu" /></td>
+                <td><input class="table-input pending-input" type="number" min="0" value="9563" aria-label="Pending amount for Chandu" /></td>
+                <td><span class="status pending">Pending</span></td>
               </tr>
               <tr>
-                <td>Vikram</td>
-                <td>D</td>
-                <td>Rs. 7,500</td>
-                <td>Rs. 4,500</td>
-                <td>Rs. 3,000</td>
+                <td><input class="table-input name-input" type="text" value="Kushal" aria-label="Member name Kushal" /></td>
+                <td><input class="table-input rent-input" type="number" min="0" value="9563" aria-label="Rent amount for Kushal" /></td>
+                <td><input class="table-input paid-input" type="number" min="0" value="0" aria-label="Paid amount for Kushal" /></td>
+                <td><input class="table-input pending-input" type="number" min="0" value="9563" aria-label="Pending amount for Kushal" /></td>
+                <td><span class="status pending">Pending</span></td>
+              </tr>
+              <tr>
+                <td><input class="table-input name-input" type="text" value="Maggie" aria-label="Member name Maggie" /></td>
+                <td><input class="table-input rent-input" type="number" min="0" value="9563" aria-label="Rent amount for Maggie" /></td>
+                <td><input class="table-input paid-input" type="number" min="0" value="0" aria-label="Paid amount for Maggie" /></td>
+                <td><input class="table-input pending-input" type="number" min="0" value="9563" aria-label="Pending amount for Maggie" /></td>
+                <td><span class="status pending">Pending</span></td>
+              </tr>
+              <tr>
+                <td><input class="table-input name-input" type="text" value="Charan" aria-label="Member name Charan" /></td>
+                <td><input class="table-input rent-input" type="number" min="0" value="9563" aria-label="Rent amount for Charan" /></td>
+                <td><input class="table-input paid-input" type="number" min="0" value="0" aria-label="Paid amount for Charan" /></td>
+                <td><input class="table-input pending-input" type="number" min="0" value="9563" aria-label="Pending amount for Charan" /></td>
+                <td><span class="status pending">Pending</span></td>
+              </tr>
+              <tr>
+                <td><input class="table-input name-input" type="text" value="Sujith" aria-label="Member name Sujith" /></td>
+                <td><input class="table-input rent-input" type="number" min="0" value="9563" aria-label="Rent amount for Sujith" /></td>
+                <td><input class="table-input paid-input" type="number" min="0" value="0" aria-label="Paid amount for Sujith" /></td>
+                <td><input class="table-input pending-input" type="number" min="0" value="9563" aria-label="Pending amount for Sujith" /></td>
+                <td><span class="status pending">Pending</span></td>
+              </tr>
+              <tr>
+                <td><input class="table-input name-input" type="text" value="Uday" aria-label="Member name Uday" /></td>
+                <td><input class="table-input rent-input" type="number" min="0" value="9563" aria-label="Rent amount for Uday" /></td>
+                <td><input class="table-input paid-input" type="number" min="0" value="0" aria-label="Paid amount for Uday" /></td>
+                <td><input class="table-input pending-input" type="number" min="0" value="9563" aria-label="Pending amount for Uday" /></td>
                 <td><span class="status pending">Pending</span></td>
               </tr>
             </tbody>
           </table>
-        </div>
-      </section>
-
-      <section class="section expenses-section" id="expenses">
-        <div class="section-heading reveal">
-          <p class="eyebrow">House Expenses</p>
-          <h2>Monthly numbers to review together.</h2>
-        </div>
-
-        <div class="stats-grid">
-          <article class="stat-card reveal">
-            <i class="fa-solid fa-building" aria-hidden="true"></i>
-            <span>Monthly Rent</span>
-            <strong data-count="31000">0</strong>
-          </article>
-          <article class="stat-card reveal">
-            <i class="fa-solid fa-bolt" aria-hidden="true"></i>
-            <span>Electricity Bill</span>
-            <strong data-count="2600">0</strong>
-          </article>
-          <article class="stat-card reveal">
-            <i class="fa-solid fa-wifi" aria-hidden="true"></i>
-            <span>WiFi</span>
-            <strong data-count="999">0</strong>
-          </article>
-          <article class="stat-card reveal">
-            <i class="fa-solid fa-droplet" aria-hidden="true"></i>
-            <span>Water</span>
-            <strong data-count="800">0</strong>
-          </article>
-          <article class="stat-card reveal">
-            <i class="fa-solid fa-utensils" aria-hidden="true"></i>
-            <span>Kitchen</span>
-            <strong data-count="5200">0</strong>
-          </article>
-          <article class="stat-card reveal">
-            <i class="fa-solid fa-broom" aria-hidden="true"></i>
-            <span>Cleaning</span>
-            <strong data-count="1200">0</strong>
-          </article>
-          <article class="stat-card reveal total">
-            <i class="fa-solid fa-chart-pie" aria-hidden="true"></i>
-            <span>Total Expenses</span>
-            <strong data-count="41799">0</strong>
-          </article>
-          <article class="stat-card reveal alert-stat">
-            <i class="fa-solid fa-wallet" aria-hidden="true"></i>
-            <span>Pending Amount</span>
-            <strong data-count="6000">0</strong>
-          </article>
         </div>
       </section>
 

@@ -325,6 +325,15 @@ function getAmount(input) {
   return Math.max(Number(input?.value || 0), 0);
 }
 
+function formatAmountInput(value) {
+  const rounded = Math.round((Number(value) || 0) * 100) / 100;
+  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(2);
+}
+
+function formatCurrency(value) {
+  return `Rs. ${currencyFormatter.format(Math.round((Number(value) || 0) * 100) / 100)}`;
+}
+
 function setStatus(row) {
   const rent = getAmount(row.querySelector(".rent-input"));
   const paid = getAmount(row.querySelector(".paid-input"));
@@ -348,9 +357,41 @@ function updateRentTotals() {
 
   if (memberCount) memberCount.textContent = String(rows.length);
   if (totalPendingOutput) {
-    totalPendingOutput.textContent = `Rs. ${currencyFormatter.format(pendingTotal)}`;
+    totalPendingOutput.textContent = formatCurrency(pendingTotal);
   }
   saveRentState();
+}
+
+function recalculateMemberShares() {
+  const rows = Array.from(rentTable?.querySelectorAll("tbody tr") || []);
+  const totalRent = getAmount(totalRentInput);
+
+  if (!rows.length) {
+    if (defaultPendingInput) defaultPendingInput.value = "0";
+    updateRentTotals();
+    return;
+  }
+
+  const totalCents = Math.round(totalRent * 100);
+  const baseCents = Math.floor(totalCents / rows.length);
+  const remainderCents = totalCents - baseCents * rows.length;
+  const averageShare = totalCents / rows.length / 100;
+
+  if (defaultPendingInput) {
+    defaultPendingInput.value = formatAmountInput(averageShare);
+  }
+
+  rows.forEach((row, index) => {
+    const rowShare = (baseCents + (index < remainderCents ? 1 : 0)) / 100;
+    const paid = getAmount(row.querySelector(".paid-input"));
+    const rentInput = row.querySelector(".rent-input");
+    const pendingInput = row.querySelector(".pending-input");
+
+    if (rentInput) rentInput.value = formatAmountInput(rowShare);
+    if (pendingInput) pendingInput.value = formatAmountInput(Math.max(rowShare - paid, 0));
+  });
+
+  updateRentTotals();
 }
 
 function createInputCell(className, type, value, label) {
@@ -363,6 +404,7 @@ function createInputCell(className, type, value, label) {
 
   if (type === "number") {
     input.min = "0";
+    input.step = "0.01";
   }
 
   cell.appendChild(input);
@@ -468,7 +510,7 @@ rentTable?.addEventListener("click", (event) => {
   if (!deleteButton) return;
 
   deleteButton.closest("tr")?.remove();
-  updateRentTotals();
+  recalculateMemberShares();
 });
 
 addMember?.addEventListener("click", () => {
@@ -476,7 +518,7 @@ addMember?.addEventListener("click", () => {
   const nameInput = row?.querySelector(".name-input");
   const tableShell = rentTable?.closest(".table-shell");
   if (tableShell) tableShell.scrollLeft = 0;
-  updateRentTotals();
+  recalculateMemberShares();
   nameInput?.focus();
   nameInput?.select();
 });
@@ -495,11 +537,11 @@ applyPending?.addEventListener("click", () => {
   updateRentTotals();
 });
 
-totalRentInput?.addEventListener("input", updateRentTotals);
+totalRentInput?.addEventListener("input", recalculateMemberShares);
 defaultPendingInput?.addEventListener("input", updateRentTotals);
 
 loadRentState();
-updateRentTotals();
+recalculateMemberShares();
 
 const nav = document.querySelector("#primaryNav");
 const menuToggle = document.querySelector(".menu-toggle");

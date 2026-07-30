@@ -88,6 +88,7 @@ const countdownLabel = document.querySelector("#countdownLabel");
 const meetingDateText = document.querySelector("#meetingDateText");
 const meetingTimeText = document.querySelector("#meetingTimeText");
 const meetingStorageKey = "flat102MeetingSchedule";
+let meetingStatusMessage = "";
 
 function readStoredJson(key) {
   try {
@@ -112,13 +113,89 @@ function toDateInputValue(date) {
   return `${year}-${month}-${day}`;
 }
 
+function toTimeInputValue(date) {
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${hours}:${minutes}`;
+}
+
+function addDays(date, days) {
+  const next = new Date(date);
+  next.setDate(next.getDate() + days);
+  return next;
+}
+
+function parseTimeValue(value) {
+  const [rawHours, rawMinutes] = (value || "22:30").split(":").map(Number);
+  return {
+    hours: Number.isFinite(rawHours) ? rawHours : 22,
+    minutes: Number.isFinite(rawMinutes) ? rawMinutes : 30,
+  };
+}
+
+function composeMeetingDate(dateValue, timeValue) {
+  const fallbackDate = toDateInputValue(new Date());
+  const [year, month, day] = (dateValue || fallbackDate).split("-").map(Number);
+  const { hours, minutes } = parseTimeValue(timeValue);
+  return new Date(year, month - 1, day, hours, minutes, 0, 0);
+}
+
 function getMeetingTime() {
   const fallbackDate = toDateInputValue(new Date());
   const dateValue = meetingDateInput?.value || fallbackDate;
   const timeValue = meetingTimeInput?.value || "22:30";
-  const [year, month, day] = dateValue.split("-").map(Number);
-  const [hours, minutes] = timeValue.split(":").map(Number);
-  return new Date(year, month - 1, day, hours || 0, minutes || 0, 0, 0);
+  return composeMeetingDate(dateValue, timeValue);
+}
+
+function getNextAvailableMeetingDate(now = new Date()) {
+  const selectedTime = meetingTimeInput?.value || "22:30";
+  const todayMeeting = composeMeetingDate(toDateInputValue(now), selectedTime);
+  return todayMeeting > now ? todayMeeting : addDays(todayMeeting, 1);
+}
+
+function syncMeetingMinimumDate() {
+  if (!meetingDateInput) return false;
+
+  const minMeetingDate = getNextAvailableMeetingDate();
+  const minDateValue = toDateInputValue(minMeetingDate);
+  let adjusted = false;
+  meetingDateInput.min = minDateValue;
+
+  if (!meetingDateInput.value || meetingDateInput.value < minDateValue) {
+    meetingDateInput.value = minDateValue;
+    adjusted = true;
+  }
+
+  return adjusted;
+}
+
+function normalizeMeetingSchedule(showBlockedFeedback = true) {
+  if (!meetingDateInput || !meetingTimeInput) return false;
+
+  const dateWasBlocked = syncMeetingMinimumDate();
+
+  if (dateWasBlocked) {
+    if (showBlockedFeedback) {
+      meetingStatusMessage =
+        "Past dates and completed meeting times are blocked. Meeting moved to the next available date.";
+    }
+
+    return true;
+  }
+
+  if (getMeetingTime() > new Date()) return false;
+
+  const nextMeeting = getNextAvailableMeetingDate();
+  meetingDateInput.value = toDateInputValue(nextMeeting);
+  meetingTimeInput.value = toTimeInputValue(nextMeeting);
+  syncMeetingMinimumDate();
+
+  if (showBlockedFeedback) {
+    meetingStatusMessage =
+      "Past dates and completed meeting times are blocked. Meeting moved to the next available date.";
+  }
+
+  return true;
 }
 
 function formatMeetingDate(date) {
@@ -162,17 +239,20 @@ function updateMeetingLabels() {
   if (meetingTimeText) meetingTimeText.textContent = timeLabel;
 }
 
-function saveMeetingSchedule(showFeedback = false) {
+function saveMeetingSchedule(showFeedback = false, showBlockedFeedback = true) {
+  meetingStatusMessage = "";
+  const adjusted = normalizeMeetingSchedule(showBlockedFeedback);
+
+  if (showFeedback && !adjusted) {
+    meetingStatusMessage = "Meeting schedule saved for this browser.";
+  }
+
   writeStoredJson(meetingStorageKey, {
     date: meetingDateInput?.value || toDateInputValue(new Date()),
     time: meetingTimeInput?.value || "22:30",
   });
   updateMeetingLabels();
   updateCountdown();
-
-  if (showFeedback && timerNote) {
-    timerNote.textContent = "Meeting schedule saved for this browser.";
-  }
 }
 
 function loadMeetingSchedule() {
@@ -182,10 +262,19 @@ function loadMeetingSchedule() {
   if (meetingDateInput) meetingDateInput.value = storedSchedule?.date || todayValue;
   if (meetingTimeInput) meetingTimeInput.value = storedSchedule?.time || "22:30";
 
-  saveMeetingSchedule(false);
+  saveMeetingSchedule(false, false);
 }
 
 function updateCountdown() {
+  const adjusted = normalizeMeetingSchedule(false);
+
+  if (adjusted) {
+    writeStoredJson(meetingStorageKey, {
+      date: meetingDateInput?.value || toDateInputValue(new Date()),
+      time: meetingTimeInput?.value || "22:30",
+    });
+  }
+
   const meeting = getMeetingTime();
   const now = new Date();
   const distance = meeting.getTime() - now.getTime();
@@ -209,12 +298,14 @@ function updateCountdown() {
   if (hoursElement) hoursElement.textContent = String(hours).padStart(2, "0");
   if (minutesElement) minutesElement.textContent = String(minutes).padStart(2, "0");
   if (secondsElement) secondsElement.textContent = String(seconds).padStart(2, "0");
-  if (timerNote) timerNote.textContent = "Please be ready before the meeting starts.";
+  if (timerNote) {
+    timerNote.textContent = meetingStatusMessage || "Please be ready before the meeting starts.";
+  }
   updateMeetingLabels();
 }
 
-meetingDateInput?.addEventListener("input", () => saveMeetingSchedule(false));
-meetingTimeInput?.addEventListener("input", () => saveMeetingSchedule(false));
+meetingDateInput?.addEventListener("input", () => saveMeetingSchedule(false, true));
+meetingTimeInput?.addEventListener("input", () => saveMeetingSchedule(false, true));
 saveMeeting?.addEventListener("click", () => saveMeetingSchedule(true));
 
 loadMeetingSchedule();

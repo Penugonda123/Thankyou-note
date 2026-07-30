@@ -64,7 +64,7 @@
         <div class="notification-banner reveal-load">
           <span><i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i></span>
           <strong>Attendance is Mandatory</strong>
-          <span>Today at 10:30 PM</span>
+          <span id="meetingBannerTime">Today at 10:30 PM</span>
         </div>
 
         <div class="hero-grid">
@@ -100,8 +100,12 @@
               <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
               Attendance is Mandatory
             </div>
-            <p class="timer-label">Countdown to Today &ndash; 10:30 PM</p>
+            <p class="timer-label" id="countdownLabel">Countdown to Today &ndash; 10:30 PM</p>
             <div class="countdown" id="countdown" aria-live="polite">
+              <div>
+                <strong id="days">00</strong>
+                <span>Days</span>
+              </div>
               <div>
                 <strong id="hours">00</strong>
                 <span>Hours</span>
@@ -116,6 +120,20 @@
               </div>
             </div>
             <p class="timer-note" id="timerNote">Please be ready before the meeting starts.</p>
+            <div class="meeting-editor" aria-label="Meeting schedule editor">
+              <label class="meeting-control" for="meetingDateInput">
+                <span>Meeting Date</span>
+                <input id="meetingDateInput" type="date" />
+              </label>
+              <label class="meeting-control" for="meetingTimeInput">
+                <span>Meeting Time</span>
+                <input id="meetingTimeInput" type="time" value="22:30" />
+              </label>
+              <button class="secondary-cta compact" type="button" id="saveMeeting">
+                <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+                Save Meeting
+              </button>
+            </div>
           </aside>
         </div>
 
@@ -170,12 +188,12 @@
           <article class="detail-card reveal">
             <i class="fa-solid fa-calendar-day" aria-hidden="true"></i>
             <span>Date</span>
-            <strong>Today</strong>
+            <strong id="meetingDateText">Today</strong>
           </article>
           <article class="detail-card reveal">
             <i class="fa-solid fa-clock" aria-hidden="true"></i>
             <span>Time</span>
-            <strong>10:30 PM</strong>
+            <strong id="meetingTimeText">10:30 PM</strong>
           </article>
           <article class="detail-card reveal">
             <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
@@ -293,8 +311,8 @@
 
       <section class="section summary-section" id="summary">
         <div class="section-heading reveal">
-          <p class="eyebrow">Rent Status</p>
-          <h2>Editable rent status for Flat No.102.</h2>
+          <p class="eyebrow">Flat No.102</p>
+          <h2>Rent Status for Flat No.102</h2>
         </div>
 
         <div class="rent-overview reveal" aria-label="Rent overview editor">
@@ -306,17 +324,23 @@
             <span>Default Pending</span>
             <input id="defaultPendingInput" type="number" min="0" value="9563" />
           </label>
-          <button class="secondary-cta compact" type="button" id="applyPending">
-            <i class="fa-solid fa-rotate" aria-hidden="true"></i>
-            Apply Pending
-          </button>
+          <div class="rent-actions">
+            <button class="secondary-cta compact" type="button" id="applyPending">
+              <i class="fa-solid fa-rotate" aria-hidden="true"></i>
+              Apply Pending
+            </button>
+            <button class="primary-cta compact" type="button" id="addMember">
+              <i class="fa-solid fa-plus" aria-hidden="true"></i>
+              Add Member
+            </button>
+          </div>
           <div class="summary-metric">
             <span>Members</span>
-            <strong id="memberCount">7</strong>
+            <strong id="memberCount">9</strong>
           </div>
           <div class="summary-metric warning">
             <span>Total Pending</span>
-            <strong id="totalPendingOutput">Rs. 66,941</strong>
+            <strong id="totalPendingOutput">Rs. 86,067</strong>
           </div>
         </div>
 
@@ -329,56 +353,71 @@
                 <th>Paid</th>
                 <th>Pending</th>
                 <th>Status</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td><input class="table-input name-input" type="text" value="Murali" aria-label="Member name Murali" /></td>
-                <td><input class="table-input rent-input" type="number" min="0" value="9563" aria-label="Rent amount for Murali" /></td>
-                <td><input class="table-input paid-input" type="number" min="0" value="0" aria-label="Paid amount for Murali" /></td>
-                <td><input class="table-input pending-input" type="number" min="0" value="9563" aria-label="Pending amount for Murali" /></td>
+                <td><input class="table-input name-input" type="text" value="Murali" aria-label="Member name" /></td>
+                <td><input class="table-input rent-input" type="number" min="0" value="9563" aria-label="Rent amount" /></td>
+                <td><input class="table-input paid-input" type="number" min="0" value="0" aria-label="Paid amount" /></td>
+                <td><input class="table-input pending-input" type="number" min="0" value="9563" aria-label="Pending amount" /></td>
                 <td><span class="status pending">Pending</span></td>
               </tr>
               <tr>
-                <td><input class="table-input name-input" type="text" value="Chandu" aria-label="Member name Chandu" /></td>
-                <td><input class="table-input rent-input" type="number" min="0" value="9563" aria-label="Rent amount for Chandu" /></td>
-                <td><input class="table-input paid-input" type="number" min="0" value="0" aria-label="Paid amount for Chandu" /></td>
-                <td><input class="table-input pending-input" type="number" min="0" value="9563" aria-label="Pending amount for Chandu" /></td>
+                <td><input class="table-input name-input" type="text" value="Chandu" aria-label="Member name" /></td>
+                <td><input class="table-input rent-input" type="number" min="0" value="9563" aria-label="Rent amount" /></td>
+                <td><input class="table-input paid-input" type="number" min="0" value="0" aria-label="Paid amount" /></td>
+                <td><input class="table-input pending-input" type="number" min="0" value="9563" aria-label="Pending amount" /></td>
                 <td><span class="status pending">Pending</span></td>
               </tr>
               <tr>
-                <td><input class="table-input name-input" type="text" value="Kushal" aria-label="Member name Kushal" /></td>
-                <td><input class="table-input rent-input" type="number" min="0" value="9563" aria-label="Rent amount for Kushal" /></td>
-                <td><input class="table-input paid-input" type="number" min="0" value="0" aria-label="Paid amount for Kushal" /></td>
-                <td><input class="table-input pending-input" type="number" min="0" value="9563" aria-label="Pending amount for Kushal" /></td>
+                <td><input class="table-input name-input" type="text" value="Kushal" aria-label="Member name" /></td>
+                <td><input class="table-input rent-input" type="number" min="0" value="9563" aria-label="Rent amount" /></td>
+                <td><input class="table-input paid-input" type="number" min="0" value="0" aria-label="Paid amount" /></td>
+                <td><input class="table-input pending-input" type="number" min="0" value="9563" aria-label="Pending amount" /></td>
                 <td><span class="status pending">Pending</span></td>
               </tr>
               <tr>
-                <td><input class="table-input name-input" type="text" value="Maggie" aria-label="Member name Maggie" /></td>
-                <td><input class="table-input rent-input" type="number" min="0" value="9563" aria-label="Rent amount for Maggie" /></td>
-                <td><input class="table-input paid-input" type="number" min="0" value="0" aria-label="Paid amount for Maggie" /></td>
-                <td><input class="table-input pending-input" type="number" min="0" value="9563" aria-label="Pending amount for Maggie" /></td>
+                <td><input class="table-input name-input" type="text" value="Maggie" aria-label="Member name" /></td>
+                <td><input class="table-input rent-input" type="number" min="0" value="9563" aria-label="Rent amount" /></td>
+                <td><input class="table-input paid-input" type="number" min="0" value="0" aria-label="Paid amount" /></td>
+                <td><input class="table-input pending-input" type="number" min="0" value="9563" aria-label="Pending amount" /></td>
                 <td><span class="status pending">Pending</span></td>
               </tr>
               <tr>
-                <td><input class="table-input name-input" type="text" value="Charan" aria-label="Member name Charan" /></td>
-                <td><input class="table-input rent-input" type="number" min="0" value="9563" aria-label="Rent amount for Charan" /></td>
-                <td><input class="table-input paid-input" type="number" min="0" value="0" aria-label="Paid amount for Charan" /></td>
-                <td><input class="table-input pending-input" type="number" min="0" value="9563" aria-label="Pending amount for Charan" /></td>
+                <td><input class="table-input name-input" type="text" value="Charan" aria-label="Member name" /></td>
+                <td><input class="table-input rent-input" type="number" min="0" value="9563" aria-label="Rent amount" /></td>
+                <td><input class="table-input paid-input" type="number" min="0" value="0" aria-label="Paid amount" /></td>
+                <td><input class="table-input pending-input" type="number" min="0" value="9563" aria-label="Pending amount" /></td>
                 <td><span class="status pending">Pending</span></td>
               </tr>
               <tr>
-                <td><input class="table-input name-input" type="text" value="Sujith" aria-label="Member name Sujith" /></td>
-                <td><input class="table-input rent-input" type="number" min="0" value="9563" aria-label="Rent amount for Sujith" /></td>
-                <td><input class="table-input paid-input" type="number" min="0" value="0" aria-label="Paid amount for Sujith" /></td>
-                <td><input class="table-input pending-input" type="number" min="0" value="9563" aria-label="Pending amount for Sujith" /></td>
+                <td><input class="table-input name-input" type="text" value="Sujith" aria-label="Member name" /></td>
+                <td><input class="table-input rent-input" type="number" min="0" value="9563" aria-label="Rent amount" /></td>
+                <td><input class="table-input paid-input" type="number" min="0" value="0" aria-label="Paid amount" /></td>
+                <td><input class="table-input pending-input" type="number" min="0" value="9563" aria-label="Pending amount" /></td>
                 <td><span class="status pending">Pending</span></td>
               </tr>
               <tr>
-                <td><input class="table-input name-input" type="text" value="Uday" aria-label="Member name Uday" /></td>
-                <td><input class="table-input rent-input" type="number" min="0" value="9563" aria-label="Rent amount for Uday" /></td>
-                <td><input class="table-input paid-input" type="number" min="0" value="0" aria-label="Paid amount for Uday" /></td>
-                <td><input class="table-input pending-input" type="number" min="0" value="9563" aria-label="Pending amount for Uday" /></td>
+                <td><input class="table-input name-input" type="text" value="Uday" aria-label="Member name" /></td>
+                <td><input class="table-input rent-input" type="number" min="0" value="9563" aria-label="Rent amount" /></td>
+                <td><input class="table-input paid-input" type="number" min="0" value="0" aria-label="Paid amount" /></td>
+                <td><input class="table-input pending-input" type="number" min="0" value="9563" aria-label="Pending amount" /></td>
+                <td><span class="status pending">Pending</span></td>
+              </tr>
+              <tr>
+                <td><input class="table-input name-input" type="text" value="Murari" aria-label="Member name" /></td>
+                <td><input class="table-input rent-input" type="number" min="0" value="9563" aria-label="Rent amount" /></td>
+                <td><input class="table-input paid-input" type="number" min="0" value="0" aria-label="Paid amount" /></td>
+                <td><input class="table-input pending-input" type="number" min="0" value="9563" aria-label="Pending amount" /></td>
+                <td><span class="status pending">Pending</span></td>
+              </tr>
+              <tr>
+                <td><input class="table-input name-input" type="text" value="Rohit" aria-label="Member name" /></td>
+                <td><input class="table-input rent-input" type="number" min="0" value="9563" aria-label="Rent amount" /></td>
+                <td><input class="table-input paid-input" type="number" min="0" value="0" aria-label="Paid amount" /></td>
+                <td><input class="table-input pending-input" type="number" min="0" value="9563" aria-label="Pending amount" /></td>
                 <td><span class="status pending">Pending</span></td>
               </tr>
             </tbody>

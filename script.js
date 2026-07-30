@@ -75,15 +75,114 @@ document.querySelectorAll(".magnetic").forEach((element) => {
   });
 });
 
+const daysElement = document.querySelector("#days");
 const hoursElement = document.querySelector("#hours");
 const minutesElement = document.querySelector("#minutes");
 const secondsElement = document.querySelector("#seconds");
 const timerNote = document.querySelector("#timerNote");
+const meetingDateInput = document.querySelector("#meetingDateInput");
+const meetingTimeInput = document.querySelector("#meetingTimeInput");
+const saveMeeting = document.querySelector("#saveMeeting");
+const meetingBannerTime = document.querySelector("#meetingBannerTime");
+const countdownLabel = document.querySelector("#countdownLabel");
+const meetingDateText = document.querySelector("#meetingDateText");
+const meetingTimeText = document.querySelector("#meetingTimeText");
+const meetingStorageKey = "flat102MeetingSchedule";
+
+function readStoredJson(key) {
+  try {
+    return JSON.parse(window.localStorage.getItem(key) || "null");
+  } catch {
+    return null;
+  }
+}
+
+function writeStoredJson(key, value) {
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // The page still works if browser storage is unavailable.
+  }
+}
+
+function toDateInputValue(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
 
 function getMeetingTime() {
-  const meeting = new Date();
-  meeting.setHours(22, 30, 0, 0);
-  return meeting;
+  const fallbackDate = toDateInputValue(new Date());
+  const dateValue = meetingDateInput?.value || fallbackDate;
+  const timeValue = meetingTimeInput?.value || "22:30";
+  const [year, month, day] = dateValue.split("-").map(Number);
+  const [hours, minutes] = timeValue.split(":").map(Number);
+  return new Date(year, month - 1, day, hours || 0, minutes || 0, 0, 0);
+}
+
+function formatMeetingDate(date) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+
+  const target = new Date(date);
+  target.setHours(0, 0, 0, 0);
+
+  if (target.getTime() === today.getTime()) return "Today";
+  if (target.getTime() === tomorrow.getTime()) return "Tomorrow";
+
+  return new Intl.DateTimeFormat("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(date);
+}
+
+function formatMeetingTime(date) {
+  return new Intl.DateTimeFormat("en-IN", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  })
+    .format(date)
+    .toUpperCase();
+}
+
+function updateMeetingLabels() {
+  const meeting = getMeetingTime();
+  const dateLabel = formatMeetingDate(meeting);
+  const timeLabel = formatMeetingTime(meeting);
+
+  if (meetingBannerTime) meetingBannerTime.textContent = `${dateLabel} at ${timeLabel}`;
+  if (countdownLabel) countdownLabel.textContent = `Countdown to ${dateLabel} - ${timeLabel}`;
+  if (meetingDateText) meetingDateText.textContent = dateLabel;
+  if (meetingTimeText) meetingTimeText.textContent = timeLabel;
+}
+
+function saveMeetingSchedule(showFeedback = false) {
+  writeStoredJson(meetingStorageKey, {
+    date: meetingDateInput?.value || toDateInputValue(new Date()),
+    time: meetingTimeInput?.value || "22:30",
+  });
+  updateMeetingLabels();
+  updateCountdown();
+
+  if (showFeedback && timerNote) {
+    timerNote.textContent = "Meeting schedule saved for this browser.";
+  }
+}
+
+function loadMeetingSchedule() {
+  const todayValue = toDateInputValue(new Date());
+  const storedSchedule = readStoredJson(meetingStorageKey);
+
+  if (meetingDateInput) meetingDateInput.value = storedSchedule?.date || todayValue;
+  if (meetingTimeInput) meetingTimeInput.value = storedSchedule?.time || "22:30";
+
+  saveMeetingSchedule(false);
 }
 
 function updateCountdown() {
@@ -92,31 +191,44 @@ function updateCountdown() {
   const distance = meeting.getTime() - now.getTime();
 
   if (distance <= 0) {
+    if (daysElement) daysElement.textContent = "00";
     if (hoursElement) hoursElement.textContent = "00";
     if (minutesElement) minutesElement.textContent = "00";
     if (secondsElement) secondsElement.textContent = "00";
     if (timerNote) timerNote.textContent = "Meeting time has arrived. Please join in the living room.";
+    updateMeetingLabels();
     return;
   }
 
-  const hours = Math.floor(distance / (1000 * 60 * 60));
+  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
   const minutes = Math.floor((distance / (1000 * 60)) % 60);
   const seconds = Math.floor((distance / 1000) % 60);
 
+  if (daysElement) daysElement.textContent = String(days).padStart(2, "0");
   if (hoursElement) hoursElement.textContent = String(hours).padStart(2, "0");
   if (minutesElement) minutesElement.textContent = String(minutes).padStart(2, "0");
   if (secondsElement) secondsElement.textContent = String(seconds).padStart(2, "0");
+  if (timerNote) timerNote.textContent = "Please be ready before the meeting starts.";
+  updateMeetingLabels();
 }
 
-updateCountdown();
+meetingDateInput?.addEventListener("input", () => saveMeetingSchedule(false));
+meetingTimeInput?.addEventListener("input", () => saveMeetingSchedule(false));
+saveMeeting?.addEventListener("click", () => saveMeetingSchedule(true));
+
+loadMeetingSchedule();
 window.setInterval(updateCountdown, 1000);
 
 const rentTable = document.querySelector("#rentTable");
+const totalRentInput = document.querySelector("#totalRentInput");
 const totalPendingOutput = document.querySelector("#totalPendingOutput");
 const memberCount = document.querySelector("#memberCount");
 const defaultPendingInput = document.querySelector("#defaultPendingInput");
 const applyPending = document.querySelector("#applyPending");
+const addMember = document.querySelector("#addMember");
 const currencyFormatter = new Intl.NumberFormat("en-IN");
+const rentStorageKey = "flat102RentStatus";
 
 function getAmount(input) {
   return Math.max(Number(input?.value || 0), 0);
@@ -147,6 +259,100 @@ function updateRentTotals() {
   if (totalPendingOutput) {
     totalPendingOutput.textContent = `Rs. ${currencyFormatter.format(pendingTotal)}`;
   }
+  saveRentState();
+}
+
+function createInputCell(className, type, value, label) {
+  const cell = document.createElement("td");
+  const input = document.createElement("input");
+  input.className = `table-input ${className}`;
+  input.type = type;
+  input.value = value;
+  input.setAttribute("aria-label", label);
+
+  if (type === "number") {
+    input.min = "0";
+  }
+
+  cell.appendChild(input);
+  return cell;
+}
+
+function createStatusCell() {
+  const cell = document.createElement("td");
+  const status = document.createElement("span");
+  status.className = "status pending";
+  status.textContent = "Pending";
+  cell.appendChild(status);
+  return cell;
+}
+
+function createActionCell() {
+  const cell = document.createElement("td");
+  const button = document.createElement("button");
+  button.className = "delete-member";
+  button.type = "button";
+  button.dataset.deleteMember = "true";
+  button.setAttribute("aria-label", "Delete member");
+  button.innerHTML = '<i class="fa-solid fa-trash" aria-hidden="true"></i>';
+  cell.appendChild(button);
+  return cell;
+}
+
+function appendRentRow(data = {}) {
+  const tableBody = rentTable?.querySelector("tbody");
+  if (!tableBody) return null;
+
+  const pendingValue = getAmount(defaultPendingInput);
+  const row = document.createElement("tr");
+  row.append(
+    createInputCell("name-input", "text", data.name || "New Member", "Member name"),
+    createInputCell("rent-input", "number", String(data.rent ?? pendingValue), "Rent amount"),
+    createInputCell("paid-input", "number", String(data.paid ?? 0), "Paid amount"),
+    createInputCell("pending-input", "number", String(data.pending ?? pendingValue), "Pending amount"),
+    createStatusCell(),
+    createActionCell(),
+  );
+  tableBody.appendChild(row);
+  return row;
+}
+
+function collectRentRows() {
+  return Array.from(rentTable?.querySelectorAll("tbody tr") || []).map((row) => ({
+    name: row.querySelector(".name-input")?.value || "",
+    rent: row.querySelector(".rent-input")?.value || "0",
+    paid: row.querySelector(".paid-input")?.value || "0",
+    pending: row.querySelector(".pending-input")?.value || "0",
+  }));
+}
+
+function saveRentState() {
+  writeStoredJson(rentStorageKey, {
+    totalRent: totalRentInput?.value || "0",
+    defaultPending: defaultPendingInput?.value || "0",
+    rows: collectRentRows(),
+  });
+}
+
+function loadRentState() {
+  const storedState = readStoredJson(rentStorageKey);
+  const rows = Array.isArray(storedState?.rows) && storedState.rows.length
+    ? storedState.rows
+    : collectRentRows();
+  const tableBody = rentTable?.querySelector("tbody");
+
+  if (totalRentInput && storedState?.totalRent) {
+    totalRentInput.value = storedState.totalRent;
+  }
+
+  if (defaultPendingInput && storedState?.defaultPending) {
+    defaultPendingInput.value = storedState.defaultPending;
+  }
+
+  if (tableBody) {
+    tableBody.innerHTML = "";
+    rows.forEach((row) => appendRentRow(row));
+  }
 }
 
 rentTable?.addEventListener("input", (event) => {
@@ -164,6 +370,26 @@ rentTable?.addEventListener("input", (event) => {
   updateRentTotals();
 });
 
+rentTable?.addEventListener("click", (event) => {
+  const target = event.target;
+  const deleteButton = target.closest("[data-delete-member]");
+
+  if (!deleteButton) return;
+
+  deleteButton.closest("tr")?.remove();
+  updateRentTotals();
+});
+
+addMember?.addEventListener("click", () => {
+  const row = appendRentRow();
+  const nameInput = row?.querySelector(".name-input");
+  const tableShell = rentTable?.closest(".table-shell");
+  if (tableShell) tableShell.scrollLeft = 0;
+  updateRentTotals();
+  nameInput?.focus();
+  nameInput?.select();
+});
+
 applyPending?.addEventListener("click", () => {
   const pendingValue = getAmount(defaultPendingInput);
   rentTable?.querySelectorAll("tbody tr").forEach((row) => {
@@ -178,6 +404,10 @@ applyPending?.addEventListener("click", () => {
   updateRentTotals();
 });
 
+totalRentInput?.addEventListener("input", updateRentTotals);
+defaultPendingInput?.addEventListener("input", updateRentTotals);
+
+loadRentState();
 updateRentTotals();
 
 const nav = document.querySelector("#primaryNav");
